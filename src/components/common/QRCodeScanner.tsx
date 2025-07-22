@@ -102,6 +102,7 @@ export default function QRCodeScanner({ onClose, onScan }: QRCodeScannerProps) {
         payload: JSON.parse(json.data.payload),
         created_at: json.data.created_at || "",
         respon: json.data.respon || "",
+        respon_text: json.data.respon_text || "",
       };
 
       onScan(result);
