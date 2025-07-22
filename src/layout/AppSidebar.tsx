@@ -264,14 +264,14 @@ const AppSidebar: React.FC = () => {
               <div className="relative w-[350px] h-[100px]">
                 <img
                   className="absolute top-0 left-0 dark:hidden"
-                  src="/images/logo/log.png"
+                  src="./images/logo/PassQ3bg-none.png"
                   alt="Logo"
                   width={250}
                   height={100}
                 />
                 <img
                   className="absolute top-0 left-0 hidden dark:block"
-                  src="/images/logo/log-dark.png"
+                  src="./images/logo/PassQ3bg-none.png"
                   alt="Logo"
                   width={250}
                   height={100}
@@ -289,7 +289,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.png"
+              src="./images/logo/PassQ3bg-none.png"
               alt="Logo"
               width={32}
               height={32}

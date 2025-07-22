@@ -21,12 +21,12 @@ export default function AuthLayout({
                 <img
                   width={231}
                   height={48}
-                  src="/images/logo/auth-logo.png"
+                  src="./images/logo/PassQ3bg-none.png"
                   alt="Logo"
                 />
               </Link>
               <p className="text-3xl text-center text-gray-400 dark:text-white/60">
-                Quarantine Declaration – Card Arrival Dashboard
+                Quarantine Declaration - Card Arrival Dashboard
               </p>
             </div>
           </div>

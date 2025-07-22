@@ -1,5 +1,9 @@
 import { useState } from "react";
 import AccordionItem from "../ui/accordion/AccordionItem";
+import Label from "../form/Label";
+import Select from "../form/Select";
+import Button from "../ui/button/Button";
+import TextArea from "../form/input/TextArea";
 
 interface ScannedResultProps {
   data: any;
@@ -16,20 +20,58 @@ export default function ScannedResult({
 }: ScannedResultProps) {
   const { tdHeader, karantina, id_permohonan } = data;
   const [openIndex, setOpenIndex] = useState<string | null>("karantina");
+  let [lanjutan, setLanjutan] = useState<any>({
+    rekom: "",
+    keterangan: "",
+  });
 
   const toggle = (index: string) => {
     setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
   };
 
-  //   const statusText: any => {
-  // return [
-  //   {kode: 10, keterangan: "TOLAK/QUARANTINE BIN"}, {kode: 11, keterangan: "PERIKSA"}, {kode: 12, keterangan:"RILIS"}
-  // ]
-  //   }
+  function getNipFromJson(): string | undefined {
+    const json = localStorage.getItem("user")
+    if (!json) {
+    return "";
+  }
+  try {
+    const obj = JSON.parse(json);
+    return obj.nip;
+  } catch (e) {
+    console.error("Invalid JSON:", e);
+    return undefined;
+  }
+}
+
+  const updateDeklarasi = async () => {
+    try {
+      const datakirim = {
+        id_permohonan: id_permohonan,
+        rekom: lanjutan.rekom,
+        keterangan: lanjutan.keterangan,
+        petugas: getNipFromJson()
+      }
+      const res = await fetch(
+        `https://api3.karantinaindonesia.go.id/qdec/sendQDec/petugas`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Basic bXJpZHdhbjpaPnV5JCx+NjR7KF42WDQm",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datakirim)
+        }
+      );
+      const json = await res.json();
+      console.log("json respon", json)
+    } catch (err) {
+      alert("Gagal mengambil data.");
+    }
+  };
 
   return (
     <div className="mt-2">
-      <div className="max-w-md mx-auto p-2 space-y-4">
+      <div className=" mx-auto p-2 space-y-4">
         <div className="flex mb-0 place-content-between">
           <h3 className="text-xl mb-0">No. <b>{id_permohonan}</b></h3>
           <h3 className={"text-xl mb-0 font-bold" + (respon == "10" ? " text-red-600" : (respon == "11" ? " text-amber-700" : (respon == "12" ? " text-green-700" : "")))}>{responText}</h3>
@@ -167,8 +209,31 @@ export default function ScannedResult({
           isOpen={openIndex === "karantina"}
           onClick={() => toggle("karantina")}
         />
-      </div>
+          <div className="border-2 p-2 rounded-xl">
+            <center>
+            <h2 className="text-2xl content-center">Rekomendasi Petugas</h2>
 
+            </center>
+            <hr />
+            <div className="mb-2">
+              <Label className="mb-0">Pilih Rekomendasi</Label>
+              <Select
+              defaultValue={lanjutan.rekom}
+                options={[{ value: "12", label: "Rilis" }, { value: "11", label: "Periksa Lanjutan" }, { value: "10", label: "Tolak/Quarantine Bin" }, { value: "13", label: "Ajukan ke PTK" }]}
+                placeholder="Pilih rekomendasi akhir"
+                onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e}))}
+                className="dark:bg-dark-900"
+              />
+            </div>
+            <div className="mb-2">
+              <Label className="mb-0">Keterangan</Label>
+              <TextArea value={lanjutan.keterangan} onChange={(e) => setLanjutan((x: any) => ({ ...x, keterangan: e}))} rows={2} className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" placeholder="Jelaskan tindakan karantina yang dilakukan atau yang lainnya" />
+            </div>
+            <Button onClick={updateDeklarasi} size="sm" className="w-full" variant="primary" >
+  Submit
+</Button>
+          </div>
+      </div>
     </div>
   );
 }

@@ -62,7 +62,7 @@ export default function SignInForm() {
             />
             <img
               className="hidden dark:block"
-              src="./images/logo/logo-dark.png"
+              src="./images/logo/PassQ3bg-none.png"
               alt="Logo"
               width={300}
               height={100}
