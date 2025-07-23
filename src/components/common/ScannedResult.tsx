@@ -64,6 +64,7 @@ export default function ScannedResult({
       );
       const json = await res.json();
       console.log("json respon", json)
+      alert(json?.message ?? "Berhasil simpan rekomendasi")
     } catch (err) {
       alert("Gagal mengambil data.");
     }

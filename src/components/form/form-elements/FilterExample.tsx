@@ -15,7 +15,7 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
   const [dTo, setDTo] = useState(dayjs().format("YYYY-MM-DD"));
   const [upt, setUpt] = useState(user.upt);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<any[]>([]);
+  // const [data, setData] = useState<any[]>([]);
 
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
@@ -41,11 +41,11 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
 
       const result = await res.json();
       if (result.status) {
-        setData(result.data);
+        // setData(result.data);
         onDataFiltered(result.data);
       } else {
         console.warn("API Error:", result.message);
-        setData([]);
+        // setData([]);
         onDataFiltered([]);
       }
     } catch (error) {
@@ -90,7 +90,6 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
               <option value="1000">Semua UPT</option>
               <option value="5100">BBKHIT Bali</option>
               <option value="3600">BKHIT Banten</option>
-
               <option value="3500">BKHIT Jawa Timur</option>
               {/* Tambahkan opsi UPT lain sesuai kebutuhan */}
             </select>

@@ -35,7 +35,7 @@ export default function DatePicker({
         monthSelectorType: "static",
         dateFormat: "Y-m-d",
         defaultDate: value || defaultDate,
-        onChange: (selectedDates, dateStr) => {
+        onChange: (_selectedDates, dateStr) => {
           if (onChange) onChange(dateStr);
         },
       });
