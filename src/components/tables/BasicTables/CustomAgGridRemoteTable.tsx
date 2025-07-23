@@ -73,7 +73,7 @@ export default function CustomAgGridRemoteTable({
         },
       },
 
-      { headerName: "Rekom Petugas", field: "rekom_petugas", flex: 1 },
+      { headerName: "Rekom Petugas", field: "rekom_petugas_text", flex: 1 },
 
       {
         headerName: "Detail",

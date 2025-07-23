@@ -220,7 +220,7 @@ export default function ScannedResult({
               <Label className="mb-0">Pilih Rekomendasi</Label>
               <Select
               defaultValue={lanjutan.rekom}
-                options={[{ value: "12", label: "Rilis" }, { value: "11", label: "Periksa Lanjutan" }, { value: "10", label: "Tolak/Quarantine Bin" }, { value: "13", label: "Ajukan ke PTK" }]}
+                options={[{ value: "12", label: "Rilis" }, { value: "11", label: "Periksa Lanjutan" }, { value: "10", label: "Tolak/Quarantine Bin" }]}
                 placeholder="Pilih rekomendasi akhir"
                 onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e}))}
                 className="dark:bg-dark-900"
