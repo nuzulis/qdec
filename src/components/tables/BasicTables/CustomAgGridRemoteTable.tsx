@@ -16,6 +16,7 @@ export default function CustomAgGridRemoteTable({
 }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState<any>(null);
+
   const handleDetailClick = (id: string) => {
     const found = rowData.find((item) => item.id === id);
     if (found) {
@@ -26,33 +27,79 @@ export default function CustomAgGridRemoteTable({
 
   const columnDefs = useMemo(
     () => [
-      { headerName: "ID", field: "id", flex: 1 },
+      { headerName: "Nomor QR", field: "id_qr", flex: 1 },
       { headerName: "Nama Penumpang", field: "nama_penumpang", flex: 1 },
       { headerName: "Negara Asal", field: "neg_asal", flex: 1 },
       { headerName: "Port Tujuan", field: "port_tuju", flex: 1 },
       { headerName: "Tanggal Tiba", field: "tgl_tiba", flex: 1 },
-      { headerName: "MP", field: "bentuk_mp", flex: 1 },
-      { headerName: "Respon", field: "respon", flex: 1 },
+      {
+        headerName: "MP",
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const jenis = params.data.jns_karantina || "";
+          const bentuk = params.data.bentuk_mp_id || "";
+          return `${jenis} - ${bentuk}`;
+        },
+      },
+
+      {
+        headerName: "Respon",
+        field: "respon_text",
+        flex: 1,
+        cellRenderer: ({ value }: any) => {
+          const val = value?.toUpperCase();
+
+          const getColorClass = () => {
+            switch (val) {
+              case "PERIKSA":
+                return "bg-yellow-200 text-yellow-800";
+              case "RILIS":
+                return "bg-green-200 text-green-800";
+              case "TOLAK":
+              case "Q-BIN":
+                return "bg-red-200 text-red-800";
+              default:
+                return "bg-gray-200 text-gray-800";
+            }
+          };
+
+          return (
+            <span
+              className={`px-2 py-1 rounded text-xs font-semibold ${getColorClass()}`}
+            >
+              {val}
+            </span>
+          );
+        },
+      },
+
       { headerName: "Rekom Petugas", field: "rekom_petugas", flex: 1 },
-      { headerName: "UPT", field: "upt", flex: 1 },
+
       {
         headerName: "Detail",
         field: "id",
+        flex: 1.2,
         cellRenderer: (params: any) => {
           return (
             <button
+              className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 mx-auto block"
               onClick={() => handleDetailClick(params.value)}
-              className="bg-blue-500  text-white px-4 py-1 rounded hover:bg-blue-600"
             >
               Lihat
             </button>
           );
         },
-        flex: 1.2,
       },
     ],
     [rowData]
   );
+
+  // Handle global event dari tombol "Lihat" karena tombol dibuat via string HTML
+  useState(() => {
+    const handler = (e: any) => handleDetailClick(e.detail);
+    document.addEventListener("detailClick", handler);
+    return () => document.removeEventListener("detailClick", handler);
+  });
 
   return (
     <>
@@ -68,7 +115,6 @@ export default function CustomAgGridRemoteTable({
           paginationPageSize={10}
           domLayout="autoHeight"
         />
-           {" "}
       </div>
 
       {showModal && (

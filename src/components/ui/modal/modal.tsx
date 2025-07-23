@@ -30,7 +30,7 @@ export default function DetailModal({ isOpen, onClose, data }: ModalProps) {
         {/* Isi detail */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
           {/* DetailCard... */}
-          <DetailCard label="Respon" value={data.respon} />
+          <DetailCard label="Respon" value={data.respon_text} />
           <DetailCard label="Rekomendasi Petugas" value={data.rekom_petugas} />
           <DetailCard label="Tanggal Rekomendasi" value={data.date_rekom} />
           <DetailCard label="Nama Penumpang" value={data.nama_penumpang} />
@@ -44,13 +44,10 @@ export default function DetailModal({ isOpen, onClose, data }: ModalProps) {
           <DetailCard label="Tanggal Tiba" value={data.tgl_tiba} />
           <DetailCard label="Jenis Kegiatan" value={data.jns_kegiatan} />
           <DetailCard label="Jenis Karantina" value={data.jns_karantina} />
-          <DetailCard label="Bentuk Media Pembawa" value={data.bentuk_mp} />
+          <DetailCard label="Bentuk Media Pembawa" value={data.bentuk_mp_id} />
           <DetailCard label="Tanggal Pengajuan" value={data.tgl_aju} />
-          <DetailCard label="UPT" value={data.upt} />
-
           <DetailCard label="Keterangan" value={data.keterangan} />
           <DetailCard label="Petugas Input" value={data.petugas_input} />
-          <DetailCard label="Dibuat pada" value={data.created_at} />
         </div>
 
         {/* Tombol Close di bawah modal */}

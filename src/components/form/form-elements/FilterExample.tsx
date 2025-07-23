@@ -90,9 +90,7 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
               <option value="1000">Semua UPT</option>
               <option value="5100">BBKHIT Bali</option>
               <option value="3600">BKHIT Banten</option>
-
               <option value="3500">BKHIT Jawa Timur</option>
-              {/* Tambahkan opsi UPT lain sesuai kebutuhan */}
             </select>
           </div>
         )}
