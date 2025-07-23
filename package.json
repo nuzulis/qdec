@@ -24,6 +24,7 @@
     "apexcharts": "^4.1.0",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.13",
     "flatpickr": "^4.6.13",
     "html5-qrcode": "^2.3.8",
     "react": "^19.0.0",

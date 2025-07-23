@@ -23,11 +23,11 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Quarantine Declaration",
+    name: "Dashboard",
     path: "/",
   },
   {
-    name: "CA Tabel",
+    name: "Quarantine Declaration",
     icon: <TableIcon />,
     path: "/basic-tables",
   },
