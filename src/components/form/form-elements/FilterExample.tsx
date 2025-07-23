@@ -17,8 +17,8 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
 
-  const username = "imigrasiok"; // Ganti sesuai kebutuhan
-  const password = "6SyfPqjD68RRQKe"; // Ganti sesuai kebutuhan
+  const username = "imigrasiok";
+  const password = "6SyfPqjD68RRQKe";
 
   const fetchData = async () => {
     try {
@@ -88,8 +88,10 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
               onChange={(e) => setUpt(e.target.value)}
             >
               <option value="1000">Semua UPT</option>
-              <option value="3100">DKI Jakarta</option>
-              <option value="3000">UPT Semarang</option>
+              <option value="5100">BBKHIT Bali</option>
+              <option value="3600">BKHIT Banten</option>
+
+              <option value="3500">BKHIT Jawa Timur</option>
               {/* Tambahkan opsi UPT lain sesuai kebutuhan */}
             </select>
           </div>
