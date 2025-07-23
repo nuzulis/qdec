@@ -31,10 +31,9 @@ export default function DatePicker({
     if (inputRef.current) {
       flatpickrInstance.current = flatpickr(inputRef.current, {
         mode,
-        static: true,
-        monthSelectorType: "static",
         dateFormat: "Y-m-d",
         defaultDate: value || defaultDate,
+        disableMobile: true, // ⬅️ Tambahkan baris ini
         onChange: (selectedDates, dateStr) => {
           if (onChange) onChange(dateStr);
         },

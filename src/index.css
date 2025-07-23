@@ -776,3 +776,15 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+.flatpickr-calendar {
+  z-index: 9999;
+}
+/* Flatpickr fix: sembunyikan baris input tambahan */
+.flatpickr-calendar.inline {
+  display: none !important;
+}
+
+/* Flatpickr fix tambahan jika ada input tambahan tersembunyi */
+.flatpickr-calendar.static {
+  display: none !important;
+}
