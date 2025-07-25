@@ -1,81 +1,112 @@
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ArrowRightIcon,
-  AngleUpIcon,
-  TrashBinIcon,
-  GroupIcon,
-} from "../../icons";
-import Badge from "../ui/badge/Badge";
+import { useEffect, useState } from "react";
 
-export default function EcommerceMetrics() {
+interface EcommerceMetricsProps {
+  selectedUPT: string;
+}
+
+interface MetricData {
+  label: string;
+  value: number;
+  color: string;
+}
+
+const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
+  const [metrics, setMetrics] = useState<MetricData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedUPT) return;
+
+      setLoading(true);
+
+      const dFrom = "2025-01-01";
+      const dTo = "2025-12-31";
+
+      const username = "imigrasiok";
+      const password = "6SyfPqjD68RRQKe";
+
+      try {
+        const response = await fetch(
+          "https://api3.karantinaindonesia.go.id/qdec/FindQDec",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+            },
+            body: JSON.stringify({
+              dFrom,
+              dTo,
+              upt: selectedUPT,
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (result.status && result.code === 200) {
+          const data = result.data;
+          const summaryMetrics: MetricData[] = [
+            {
+              label: "Total Data",
+              value: data.length,
+              color: "bg-blue-500",
+            },
+            {
+              label: "Total Rilis",
+              value: data.filter((d: any) => d.respon_text === "RILIS").length,
+              color: "bg-green-500",
+            },
+            {
+              label: "Total Periksa Lanjut",
+              value: data.filter((d: any) => d.respon_text === "PERIKSA")
+                .length,
+              color: "bg-yellow-500",
+            },
+
+            {
+              label: "Total Karantina Bin",
+              value: data.filter((d: any) => d.respon_text === "TOLAK/Q-BIN")
+                .length,
+              color: "bg-red-500",
+            },
+          ];
+          setMetrics(summaryMetrics);
+        } else {
+          console.error("API error:", result.message);
+          setMetrics([]);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setMetrics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedUPT]);
+
+  if (!selectedUPT) return null;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-      {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-          <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
-        </div>
-
-        <div className="flex items-end justify-between mt-5">
-          <div>
-            <span className="text-2xl text-gray-500 dark:text-gray-400">
-              Jumlah Rilis
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              3,782
-            </h4>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {loading ? (
+        <p className="col-span-4 text-center text-gray-500">Loading...</p>
+      ) : (
+        metrics.map((metric, index) => (
+          <div
+            key={index}
+            className={`rounded-lg p-4 shadow-md text-white ${metric.color}`}
+          >
+            <div className="text-sm font-medium">{metric.label}</div>
+            <div className="text-2xl font-bold">{metric.value}</div>
           </div>
-          <Badge color="success">
-            <ArrowUpIcon />
-            11.01%
-          </Badge>
-        </div>
-      </div>
-      {/* <!-- Metric Item End --> */}
-
-      {/* <!-- Metric Item Start --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-          <AngleUpIcon className="text-gray-800 size-6 dark:text-white/90" />
-        </div>
-        <div className="flex items-end justify-between mt-5">
-          <div>
-            <span className="text-2xl text-gray-500 dark:text-gray-400">
-              Jumlah Periksa Lanjut
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              5,359
-            </h4>
-          </div>
-
-          <Badge color="warning">
-            <ArrowRightIcon />
-            9.05%
-          </Badge>
-        </div>
-      </div>
-      {/* <!-- Metric Item End --> */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-          <TrashBinIcon className="text-gray-800 size-6 dark:text-white/90" />
-        </div>
-        <div className="flex items-end justify-between mt-5">
-          <div>
-            <span className="text-2xl text-gray-500 dark:text-gray-400">
-              Jumlah Quarantine Bin
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              5,359
-            </h4>
-          </div>
-
-          <Badge color="error">
-            <ArrowDownIcon />
-            9.05%
-          </Badge>
-        </div>
-      </div>
+        ))
+      )}
     </div>
   );
-}
+};
+
+export default EcommerceMetrics;
