@@ -34,8 +34,8 @@ export default function DetailModal({ isOpen, onClose, data }: ModalProps) {
           <DetailCard label="Rekomendasi Petugas" value={data.rekom_petugas_text} />
           <DetailCard label="Tanggal Rekomendasi" value={data.date_rekom} />
           <DetailCard label="Nama Penumpang" value={data.nama_penumpang} />
+          <DetailCard label="Passport" value={data.id_pass} />
           <DetailCard label="Negara Asal" value={data.neg_asal} />
-          <DetailCard label="Port Asal" value={data.port_asal} />
           <DetailCard label="Negara Tujuan" value={data.neg_tuju} />
           <DetailCard label="Port Tujuan" value={data.port_tuju} />
           <DetailCard label="Moda Transportasi" value={data.moda} />

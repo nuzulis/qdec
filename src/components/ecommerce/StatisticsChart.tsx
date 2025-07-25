@@ -15,7 +15,7 @@ const StatisticsChart = ({ selectedUPT }: StatisticsChartProps) => {
     },
   ]);
 
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
@@ -23,7 +23,7 @@ const StatisticsChart = ({ selectedUPT }: StatisticsChartProps) => {
     const fetchData = async () => {
       if (!selectedUPT) return;
 
-      setLoading(true);
+      // setLoading(true);
 
       try {
         const response = await fetch(
@@ -77,7 +77,7 @@ const StatisticsChart = ({ selectedUPT }: StatisticsChartProps) => {
           },
         ]);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 

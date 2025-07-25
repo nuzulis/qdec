@@ -28,7 +28,21 @@ export default function CustomAgGridRemoteTable({
   const columnDefs = useMemo(
     () => [
       { headerName: "Nomor QR", field: "id_qr", flex: 1 },
+      // {
+      //   headerName: "Penumpang", field: "nama_penumpang", flex: 1,
+      //   cellRenderer: (params: any) => {
+      //     const nama = params.data.nama_penumpang;
+      //     const paspor = params.data.paspor || "";
+      //     return <>
+      //       <div>
+      //         {nama}
+      //       </div>
+      //       {paspor}
+      //     </>;
+      //   },
+      // },
       { headerName: "Nama Penumpang", field: "nama_penumpang", flex: 1 },
+      { headerName: "Passport", field: "id_pass", flex: 1 },
       { headerName: "Negara Asal", field: "neg_asal", flex: 1 },
       { headerName: "Port Tujuan", field: "port_tuju", flex: 1 },
       { headerName: "Nomor Voyage", field: "nama_no_angkut", flex: 1 },
