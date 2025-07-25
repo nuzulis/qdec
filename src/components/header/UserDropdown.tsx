@@ -10,19 +10,19 @@ export default function UserDropdown() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
+    const stored = sessionStorage.getItem("user");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         setUser(parsed);
       } catch (err) {
-        console.error("Gagal parsing data user dari localStorage");
+        console.error("Gagal parsing data user dari sessionStorage");
       }
     }
   }, []);
 
   function handleLogout() {
-    localStorage.clear();
+    sessionStorage.clear();
     navigate("/signin");
   }
 

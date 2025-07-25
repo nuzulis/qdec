@@ -8,7 +8,7 @@ interface FilterExampleProps {
 }
 
 export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const isSuperAdmin = user.upt === 1000;
 
   const [dFrom, setDFrom] = useState(dayjs().format("YYYY-MM-DD"));

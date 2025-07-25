@@ -35,9 +35,9 @@ export default function SignInForm() {
       if (result.status === "200" && result.error === null) {
         const data = result.data;
 
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data));
+        sessionStorage.setItem("accessToken", data.accessToken);
+        sessionStorage.setItem("refreshToken", data.refreshToken);
+        sessionStorage.setItem("user", JSON.stringify(data));
 
         navigate("/");
       } else {

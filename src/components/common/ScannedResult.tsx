@@ -30,7 +30,7 @@ export default function ScannedResult({
   };
 
   function getNipFromJson(): string | undefined {
-    const json = localStorage.getItem("user")
+    const json = sessionStorage.getItem("user")
     if (!json) {
     return "";
   }
