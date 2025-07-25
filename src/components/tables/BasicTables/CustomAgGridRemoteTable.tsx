@@ -31,6 +31,7 @@ export default function CustomAgGridRemoteTable({
       { headerName: "Nama Penumpang", field: "nama_penumpang", flex: 1 },
       { headerName: "Negara Asal", field: "neg_asal", flex: 1 },
       { headerName: "Port Tujuan", field: "port_tuju", flex: 1 },
+      { headerName: "Nomor Voyage", field: "nama_no_angkut", flex: 1 },
       { headerName: "Tanggal Tiba", field: "tgl_tiba", flex: 1 },
       {
         headerName: "MP",
@@ -109,6 +110,7 @@ export default function CustomAgGridRemoteTable({
       >
         <AgGridReact
           theme="legacy"
+          enableCellTextSelection={true}
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}

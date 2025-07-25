@@ -31,7 +31,7 @@ export default function DetailModal({ isOpen, onClose, data }: ModalProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
           {/* DetailCard... */}
           <DetailCard label="Respon" value={data.respon_text} />
-          <DetailCard label="Rekomendasi Petugas" value={data.rekom_petugas} />
+          <DetailCard label="Rekomendasi Petugas" value={data.rekom_petugas_text} />
           <DetailCard label="Tanggal Rekomendasi" value={data.date_rekom} />
           <DetailCard label="Nama Penumpang" value={data.nama_penumpang} />
           <DetailCard label="Negara Asal" value={data.neg_asal} />

@@ -10,7 +10,7 @@ import ScanDeklarasi from "./pages/Tables/ScanDeklarasi";
 
 export default function App() {
   return (
-    <Router basename="/officer">
+    <Router basename="/officer/">
       <ScrollToTop />
       <Routes>
         {/* All pages with sidebar + header */}
