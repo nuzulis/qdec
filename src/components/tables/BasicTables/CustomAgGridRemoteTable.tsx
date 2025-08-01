@@ -4,9 +4,6 @@ import DetailModal from "../../ui/modal/modal";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import useDarkMode from "../../../hooks/useDarkMode";
-import { TableStyles } from "react-data-table-component";
-import { max } from "date-fns";
-import { AppWrapper } from "../../common/PageMeta";
 
 type RowType = {
   id: string;
