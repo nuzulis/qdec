@@ -1,75 +1,148 @@
-import { FaTimes } from "react-icons/fa";
-import { MdOutlineInfo } from "react-icons/md";
+import { useState } from "react";
+import AccordionItem from "../accordion/AccordionItem";
 
-interface ModalProps {
+interface DetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   data: any;
 }
 
-export default function DetailModal({ isOpen, onClose, data }: ModalProps) {
-  if (!isOpen || !data) return null;
+export default function DetailModal({
+  isOpen,
+  onClose,
+  data,
+}: DetailModalProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  // Parse payload JSON safely
+  let parsedPayload: any = null;
+  try {
+    parsedPayload = data?.payload ? JSON.parse(data.payload) : null;
+  } catch (error) {
+    console.error("Invalid JSON in payload:", error);
+  }
+
+  const handleToggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 bg-blue bg-opacity-10 backdrop-blur-sm overflow-y-auto pt-24 pb-10 px-4">
-      <div className="bg-blue-50 rounded-2xl shadow-2xl w-full max-w-4xl mx-auto p-6 relative animate-fade-in space-y-4">
-        {/* Tombol close di pojok kanan atas */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
-        >
-          <FaTimes className="w-5 h-5" />
-        </button>
+    <div className={`fixed inset-0 z-50 ${isOpen ? "" : "hidden"}`}>
+      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose} />
+      <div className="relative z-10 bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto mt-10">
+        <h2 className="text-xl font-semibold mb-4">Detail Data</h2>
 
-        {/* Judul */}
-        <div className="flex items-center gap-2 text-blue-900">
-          <MdOutlineInfo className="w-6 h-6" />
-          <h2 className="text-2xl font-bold">Detail Data Deklarasi</h2>
-        </div>
+        <AccordionItem
+          title="Identitas Penumpang"
+          isOpen={openIndex === 0}
+          onClick={() => handleToggle(0)}
+          content={
+            <div>
+              <p>
+                <strong>Nama:</strong> {data?.nama_penumpang}
+              </p>
+              <p>
+                <strong>Paspor:</strong> {data?.id_pass}
+              </p>
+              <p>
+                <strong>Negara Asal:</strong> {data?.neg_asal}
+              </p>
+              <p>
+                <strong>Lokasi Kedatangan:</strong> {data?.nama_pelabuhan}
+              </p>
+              <p>
+                <strong>Nomor Penerbangan:</strong> {data?.nama_no_angkut}
+              </p>
+              <p>
+                <strong>Waktu Keberangkatan:</strong> {data?.tgl_berangkat}
+              </p>
+              <p>
+                <strong>Waktu Kedatangan:</strong> {data?.tgl_tiba}
+              </p>
+            </div>
+          }
+        />
 
-        {/* Isi detail */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-          {/* DetailCard... */}
-          <DetailCard label="Respon" value={data.respon_text} />
-          <DetailCard label="Rekomendasi Petugas" value={data.rekom_petugas_text} />
-          <DetailCard label="Tanggal Rekomendasi" value={data.date_rekom} />
-          <DetailCard label="Nama Penumpang" value={data.nama_penumpang} />
-          <DetailCard label="Passport" value={data.id_pass} />
-          <DetailCard label="Negara Asal" value={data.neg_asal} />
-          <DetailCard label="Negara Tujuan" value={data.neg_tuju} />
-          <DetailCard label="Port Tujuan" value={data.port_tuju} />
-          <DetailCard label="Moda Transportasi" value={data.moda} />
-          <DetailCard label="Nama/No Angkut" value={data.nama_no_angkut} />
-          <DetailCard label="Tanggal Berangkat" value={data.tgl_berangkat} />
-          <DetailCard label="Tanggal Tiba" value={data.tgl_tiba} />
-          <DetailCard label="Jenis Kegiatan" value={data.jns_kegiatan} />
-          <DetailCard label="Jenis Karantina" value={data.jns_karantina} />
-          <DetailCard label="Bentuk Media Pembawa" value={data.bentuk_mp_id} />
-          <DetailCard label="Tanggal Pengajuan" value={data.tgl_aju} />
-          <DetailCard label="Keterangan" value={data.keterangan} />
-          <DetailCard label="Petugas Input" value={data.petugas_input} />
-        </div>
+        <AccordionItem
+          title="Komoditas Karantina"
+          isOpen={openIndex === 1}
+          onClick={() => handleToggle(1)}
+          content={
+            <div>
+              <p>
+                <strong>Jenis:</strong> {data?.jns_karantina}
+              </p>
+              <p>
+                <strong>Bentuk:</strong> {data?.bentuk_mp_id}
+              </p>
+              {parsedPayload?.karantina?.jumlah?.keterangan && (
+                <p>
+                  <strong>Jumlah:</strong>{" "}
+                  {parsedPayload.karantina.jumlah.keterangan}
+                </p>
+              )}
+            </div>
+          }
+        />
 
-        {/* Tombol Close di bawah modal */}
-        <div className="flex justify-end pt-4">
+        <AccordionItem
+          title="Hasil Pemeriksaan"
+          isOpen={openIndex === 2}
+          onClick={() => handleToggle(2)}
+          content={
+            <div>
+              <p>
+                <strong>Rekomendasi Petugas:</strong>{" "}
+                <span
+                  className={
+                    "text-sm px-3 py-1 rounded-full font-semibold shadow inline-block " +
+                    (data?.respon === "10"
+                      ? "bg-red-100 text-red-700"
+                      : data?.respon === "11"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : data?.respon === "12"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-700")
+                  }
+                >
+                  {data?.rekom_petugas_text || "-"}
+                </span>
+              </p>
+              <p>
+                <strong>Respon:</strong>{" "}
+                <span
+                  className={
+                    "text-sm px-3 py-1 rounded-full font-semibold shadow inline-block " +
+                    (data?.respon === "10"
+                      ? "bg-red-100 text-red-700"
+                      : data?.respon === "11"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : data?.respon === "12"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-700")
+                  }
+                >
+                  {data?.respon_text || "-"}
+                </span>
+              </p>
+
+              <p>
+                <strong>Jenis MP:</strong> {data?.jns_karantina} -{" "}
+                {data?.bentuk_mp_id}
+              </p>
+            </div>
+          }
+        />
+
+        <div className="mt-6 text-right">
           <button
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             onClick={onClose}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-red-600 transition"
           >
             Tutup
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-function DetailCard({ label, value }: { label: string; value: string | null }) {
-  return (
-    <div className="bg-white border border-blue-200 rounded-xl p-3 shadow-sm">
-      <p className="text-gray-500 font-medium">{label}</p>
-      <p className="text-blue-900 font-semibold mt-1 text-sm break-words">
-        {value || <span className="italic text-gray-400">-</span>}
-      </p>
     </div>
   );
 }

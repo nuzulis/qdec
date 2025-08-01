@@ -13,7 +13,7 @@ export default function BasicTables() {
         title="qd dashboard"
         description="This is qd dashboard Karantina Indonesia"
       />
-      <PageBreadcrumb pageTitle="Card Arrival Declaration" />
+      <PageBreadcrumb pageTitle="Quarantine Declaration" />
 
       <div className="space-y-6">
         <FilterExample onDataFiltered={setFilteredData} />
