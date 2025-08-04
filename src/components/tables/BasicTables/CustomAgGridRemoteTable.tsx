@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import DetailModal from "../../ui/modal/modal";
 import ExcelJS from "exceljs";
@@ -48,14 +48,14 @@ export default function CustomRDTCRemoteTable({
   const columns: TableColumn<RowType>[] = [
     {
       name: "Nomor QR",
-      selector: (row) => row.id_qr,
+      selector: (row: { id_qr: any; }) => row.id_qr,
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "Nama Penumpang",
-      cell: (row) => (
+      cell: (row: { nama_penumpang: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; id_pass: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) => (
         <div className="leading-tight">
           <div className="font-semibold text-sm">{row.nama_penumpang}</div>
           <div className="text-xs text-gray-600">Paspor: {row.id_pass}</div>
@@ -67,37 +67,37 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "Negara Asal",
-      selector: (row) => row.neg_asal,
+      selector: (row: { neg_asal: any; }) => row.neg_asal,
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "Port Tujuan",
-      selector: (row) => row.port_tuju,
+      selector: (row: { port_tuju: any; }) => row.port_tuju,
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "Nomor Voyage",
-      selector: (row) => row.nama_no_angkut,
+      selector: (row: { nama_no_angkut: any; }) => row.nama_no_angkut,
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "Tanggal Tiba",
-      selector: (row) => row.tgl_tiba,
+      selector: (row: { tgl_tiba: any; }) => row.tgl_tiba,
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "MP",
-      selector: (row) =>
+      selector: (row: { jns_karantina: any; bentuk_mp_id: any; }) =>
         `${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}`,
-      cell: (row) => (
+      cell: (row: { jns_karantina: any; bentuk_mp_id: any; }) => (
         <span className="text-sm">
           {`${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}`}
         </span>
@@ -108,8 +108,8 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "Respon",
-      selector: (row) => row.respon_text?.toUpperCase() || "-",
-      cell: (row) => {
+      selector: (row: { respon_text: string; }) => row.respon_text?.toUpperCase() || "-",
+      cell: (row: { respon_text: string; }) => {
         const val = row.respon_text?.toUpperCase() || "-";
         const getColorClass = () => {
           switch (val) {
@@ -137,14 +137,14 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "Rekom Petugas",
-      selector: (row) => row.rekom_petugas_text || "-",
+      selector: (row: { rekom_petugas_text: any; }) => row.rekom_petugas_text || "-",
       sortable: true,
       wrap: true,
       maxWidth: "200px",
     },
     {
       name: "Detail",
-      cell: (row) => (
+      cell: (row: { id: string; }) => (
         <button
           className="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600"
           onClick={() => handleDetailClick(row.id)}
