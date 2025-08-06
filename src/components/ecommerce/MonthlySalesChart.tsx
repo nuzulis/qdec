@@ -88,7 +88,7 @@ export default function MonthlySalesChart({
         "Mei",
         "Jun",
         "Jul",
-        "Agu",
+        "Agt",
         "Sep",
         "Okt",
         "Nov",
