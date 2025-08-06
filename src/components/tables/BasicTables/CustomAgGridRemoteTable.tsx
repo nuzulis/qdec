@@ -14,10 +14,10 @@ type RowType = {
   port_tuju: string;
   nama_no_angkut: string;
   tgl_tiba: string;
-  jns_karantina?: string;
-  bentuk_mp_id?: string;
-  respon_text?: string;
-  rekom_petugas_text?: string;
+  jns_karantina: any;
+  bentuk_mp_id: any;
+  respon_text: string;
+  rekom_petugas_text: any;
 };
 
 export default function CustomRDTCRemoteTable({
@@ -137,7 +137,7 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "Rekom Petugas",
-      selector: (row: { rekom_petugas_text: any; }) => row.rekom_petugas_text || "-",
+      selector: (row: { rekom_petugas_text: string }) => row.rekom_petugas_text || "-",
       sortable: true,
       wrap: true,
       maxWidth: "200px",
