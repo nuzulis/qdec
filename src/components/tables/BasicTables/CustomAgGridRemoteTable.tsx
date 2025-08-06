@@ -4,7 +4,7 @@ import DetailModal from "../../ui/modal/modal";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import useDarkMode from "../../../hooks/useDarkMode";
-
+import dayjs from "dayjs";
 type RowType = {
   id: string;
   id_qr: string;
@@ -88,7 +88,7 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "Tanggal Tiba",
-      selector: (row) => row.tgl_tiba,
+      selector: (row) => dayjs(row.tgl_tiba).format("DD/MM/YYYY"),
       sortable: true,
       wrap: true,
       maxWidth: "200px",
