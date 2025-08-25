@@ -9,53 +9,74 @@ interface FilterExampleProps {
 
 export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const isSuperAdmin = user.upt === 1000;
+  const isSuperAdmin = user.upt === 1000; // tetap cek sebagai number
+  const [upt, setUpt] = useState(isSuperAdmin ? "all" : String(user.upt));
 
   const [dFrom, setDFrom] = useState(dayjs().format("YYYY-MM-DD"));
   const [dTo, setDTo] = useState(dayjs().format("YYYY-MM-DD"));
-  const [upt, setUpt] = useState(user.upt);
   const [isLoading, setIsLoading] = useState(false);
-  // const [data, setData] = useState<any[]>([]);
 
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
-
+  const uptList = [
+    { id: "5100", nama: "BBKHIT Bali" },
+    { id: "3500", nama: "BKHIT Jawa Timur" },
+    { id: "3600", nama: "BKHIT Banten" },
+  ];
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const url = `https://api3.karantinaindonesia.go.id/qdec/FindQDec`;
-      const params = {
-        dFrom,
-        dTo,
-        upt,
-      };
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(`${username}:${password}`)}`,
-        },
-        body: JSON.stringify(params),
-      });
+      let targetUPTs: string[] = [];
 
-      const result = await res.json();
-      if (result.status) {
-        // setData(result.data);
-        onDataFiltered(result.data);
+      if (isSuperAdmin) {
+        if (!upt || upt === "all") {
+          targetUPTs = uptList.map((u) => u.id);
+        } else {
+          targetUPTs = [upt];
+        }
       } else {
-        console.warn("API Error:", result.message);
-        // setData([]);
-        onDataFiltered([]);
+        targetUPTs = [upt];
       }
+
+      const allData: any[] = [];
+
+      for (const u of targetUPTs) {
+        const params = {
+          dFrom,
+          dTo,
+          upt: u,
+        };
+
+        const res = await fetch(
+          `https://api3.karantinaindonesia.go.id/qdec/FindQDec`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+            },
+            body: JSON.stringify(params),
+          }
+        );
+
+        const result = await res.json();
+        if (result.status) {
+          allData.push(...result.data);
+        } else {
+          console.warn("API Error:", result.message);
+        }
+      }
+
+      onDataFiltered(allData);
     } catch (error) {
       console.error("Fetch error:", error);
+      onDataFiltered([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Fetch data default saat load
   useEffect(() => {
     fetchData();
   }, []);
@@ -102,14 +123,16 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
               UPT
             </label>
             <select
-              className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:border-gray-700 dark:focus:border-brand-800"
               value={upt}
               onChange={(e) => setUpt(e.target.value)}
+              className="h-11 w-full rounded-lg border ..."
             >
-              <option value="">PILIH UPT</option>
-              <option value="5100">BBKHIT Bali</option>
-              <option value="3600">BKHIT Banten</option>
-              <option value="3500">BKHIT Jawa Timur</option>
+              <option value="all">Semua UPT</option>
+              {uptList.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.nama}
+                </option>
+              ))}
             </select>
           </div>
         )}

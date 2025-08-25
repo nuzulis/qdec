@@ -1,172 +1,119 @@
-import { useEffect, useState } from "react";
-import Chart from "react-apexcharts";
-import { ApexOptions } from "apexcharts";
-import ChartTab from "../common/ChartTab";
+import { useState, useEffect } from "react";
 
-interface StatisticsChartProps {
+type DecRow = {
+  tgl_tiba: string;
+  nama_no_angkut: string;
+  nama_pelabuhan: string;
+  nama_penumpang: string;
+  respon_text: string;
+};
+
+interface Props {
   selectedUPT: string;
+  isSuperadmin: boolean;
 }
 
-const StatisticsChart = ({ selectedUPT }: StatisticsChartProps) => {
-  const [series, setSeries] = useState([
-    {
-      name: "Jumlah Data",
-      data: Array(12).fill(0),
-    },
-  ]);
-
-  // const [loading, setLoading] = useState(true);
-
-  const username = "imigrasiok";
-  const password = "6SyfPqjD68RRQKe";
+export default function StatisticsChart({ selectedUPT, isSuperadmin }: Props) {
+  const [rows, setRows] = useState<DecRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const uptParam = isSuperadmin
+    ? selectedUPT || "all" // kalau superadmin & belum pilih, default "all"
+    : selectedUPT;
   useEffect(() => {
     const fetchData = async () => {
-      if (!selectedUPT) return;
-
-      // setLoading(true);
-
+      setLoading(true);
       try {
-        const response = await fetch(
+        const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+        const body = {
+          dFrom: today,
+          dTo: today,
+          upt: uptParam,
+        };
+
+        const res = await fetch(
           "https://api3.karantinaindonesia.go.id/qdec/FindQDec",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+              Authorization: "Basic " + btoa("imigrasiok:6SyfPqjD68RRQKe"),
             },
-            body: JSON.stringify({
-              dFrom: "2025-01-01",
-              dTo: "2025-12-31",
-              upt: selectedUPT,
-            }),
+            body: JSON.stringify(body),
           }
         );
 
-        const result = await response.json();
+        const data = await res.json();
 
-        if (result.status && result.data) {
-          const monthlyCount = Array(12).fill(0);
-
-          result.data.forEach((item: any) => {
-            const createdAt = new Date(item.created_at);
-            const month = createdAt.getMonth(); // 0 = Jan, 11 = Dec
-            monthlyCount[month]++;
-          });
-
-          setSeries([
-            {
-              name: "Jumlah Data",
-              data: monthlyCount,
-            },
-          ]);
+        if (data?.status && Array.isArray(data?.data)) {
+          // simpan semua data, sorting dilakukan di render
+          setRows(data.data);
         } else {
-          console.error("API Error:", result.message);
-          setSeries([
-            {
-              name: "Jumlah Data",
-              data: Array(12).fill(0),
-            },
-          ]);
+          setRows([]);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
-        setSeries([
-          {
-            name: "Jumlah Data",
-            data: Array(12).fill(0),
-          },
-        ]);
+        console.error("Error fetching:", err);
+        setRows([]);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [selectedUPT]);
+    const interval = setInterval(fetchData, 30000);
 
-  const options: ApexOptions = {
-    legend: { show: false },
-    colors: ["#465FFF"],
-    chart: {
-      fontFamily: "Outfit, sans-serif",
-      height: 310,
-      type: "line",
-      toolbar: { show: false },
-    },
-    stroke: { curve: "straight", width: 2 },
-    fill: {
-      type: "gradient",
-      gradient: { opacityFrom: 0.55, opacityTo: 0 },
-    },
-    markers: {
-      size: 0,
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: { size: 6 },
-    },
-    grid: {
-      xaxis: { lines: { show: false } },
-      yaxis: { lines: { show: true } },
-    },
-    dataLabels: { enabled: false },
-    tooltip: {
-      enabled: true,
-      x: { format: "MMM" },
-    },
-    xaxis: {
-      type: "category",
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      tooltip: { enabled: false },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          fontSize: "12px",
-          colors: ["#6B7280"],
-        },
-      },
-      title: {
-        text: "",
-        style: { fontSize: "0px" },
-      },
-    },
-  };
-
+    return () => clearInterval(interval);
+  }, [selectedUPT, isSuperadmin]);
+  const sortedRows = [...rows]
+    .sort(
+      (a, b) => new Date(b.tgl_tiba).getTime() - new Date(a.tgl_tiba).getTime()
+    )
+    .slice(0, 10);
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-      <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
-        <div className="w-full">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Statistik Deklarasi Bulanan
-          </h3>
-        </div>
-        <div className="flex items-start w-full gap-3 sm:justify-end">
-          <ChartTab />
-        </div>
-      </div>
-
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="min-w-[1000px] xl:min-w-full">
-          <Chart options={options} series={series} type="area" height={310} />
-        </div>
-      </div>
+    <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-200">
+      {loading ? (
+        <p className="p-4">Loading...</p>
+      ) : sortedRows.length > 0 ? (
+        <table className="min-w-full text-sm text-left text-gray-700">
+          <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+            <tr>
+              <th className="px-4 py-2">Tanggal Tiba</th>
+              <th className="px-4 py-2">Nomor Pesawat</th>
+              <th className="px-4 py-2">Pelabuhan / Bandara</th>
+              <th className="px-4 py-2">Nama Penumpang</th>
+              <th className="px-4 py-2">Respon</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedRows.map((row, i) => (
+              <tr key={i} className="border-b hover:bg-gray-50 transition">
+                <td className="px-4 py-2">
+                  {new Date(row.tgl_tiba).toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </td>
+                <td className="px-4 py-2">{row.nama_no_angkut}</td>
+                <td className="px-4 py-2">{row.nama_pelabuhan}</td>
+                <td className="px-4 py-2 font-medium">{row.nama_penumpang}</td>
+                <td
+                  className={`px-4 py-2 font-semibold ${
+                    row.respon_text === "RILIS"
+                      ? "text-green-600"
+                      : row.respon_text === "TOLAK/Q-BIN"
+                      ? "text-red-600"
+                      : "text-yellow-600"
+                  }`}
+                >
+                  {row.respon_text || "Belum Ada Respon"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="p-4">Tidak ada data</p>
+      )}
     </div>
   );
-};
-
-export default StatisticsChart;
+}

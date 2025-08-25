@@ -8,17 +8,24 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { format, parseISO } from "date-fns";
-import { id } from "date-fns/locale";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 interface MonthlySalesChartProps {
   selectedUPT: string;
+  isSuperadmin?: boolean;
 }
+
+// Warna untuk tiap respon
+const colors: Record<string, string> = {
+  RILIS: "#10B981", // hijau
+  PERIKSA: "#F59E0B", // oranye
+  "TOLAK/Q-BIN": "#EF4444", // merah
+};
 
 export default function MonthlySalesChart({
   selectedUPT,
+  isSuperadmin,
 }: MonthlySalesChartProps) {
   const [chartData, setChartData] = useState<any>({
     labels: [],
@@ -26,60 +33,44 @@ export default function MonthlySalesChart({
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const dFrom = "2025-01-01";
-  const dTo = "2025-12-31";
+  const tahun = "2025";
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const url = "https://api3.karantinaindonesia.go.id/qdec/FindQDec";
       const params = {
-        dFrom,
-        dTo,
-        upt: selectedUPT,
+        bulan: "all",
+        tahun,
+        upt: isSuperadmin
+          ? !selectedUPT || selectedUPT === "all"
+            ? ""
+            : selectedUPT
+          : selectedUPT,
+        kar: "",
       };
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(`${username}:${password}`)}`,
-        },
-        body: JSON.stringify(params),
-      });
+      const res = await fetch(
+        "https://api3.karantinaindonesia.go.id/qdec/findQDec/dashboard",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+          },
+          body: JSON.stringify(params),
+        }
+      );
 
-      const json = await response.json();
-
+      const json = await res.json();
       if (!json.status || !Array.isArray(json.data)) {
-        console.error("Invalid response or data format:", json);
+        console.error("Invalid response:", json);
+        setIsLoading(false);
         return;
       }
 
-      const dataArray = json.data;
-
-      const bulanMap = new Map<string, number>();
-
-      dataArray.forEach((item: any) => {
-        const tanggalStr = item.tgl_tiba || item.tgl_aju;
-        if (!tanggalStr) return;
-
-        let tanggal;
-        try {
-          tanggal = parseISO(tanggalStr);
-        } catch (e) {
-          console.error("Parse error:", tanggalStr);
-          return;
-        }
-
-        if (isNaN(tanggal.getTime())) return;
-
-        const bulan = format(tanggal, "MMM", { locale: id });
-        const prev = bulanMap.get(bulan) || 0;
-        bulanMap.set(bulan, prev + 1);
-      });
-
+      // Label bulan urut
       const bulanUrut = [
         "Jan",
         "Feb",
@@ -94,19 +85,35 @@ export default function MonthlySalesChart({
         "Nov",
         "Des",
       ];
-      const labels = bulanUrut;
-      const data = bulanUrut.map((b) => bulanMap.get(b) || 0);
+
+      // siapkan struktur data per respon
+      const responList = ["RILIS", "PERIKSA", "TOLAK/Q-BIN"];
+
+      const responData: Record<string, number[]> = {
+        RILIS: Array(12).fill(0),
+        PERIKSA: Array(12).fill(0),
+        "TOLAK/Q-BIN": Array(12).fill(0),
+      };
+
+      // isi data sesuai API
+      json.data.forEach((item: any) => {
+        const idx = parseInt(item.bln, 10) - 1;
+        if (idx < 0 || idx > 11) return;
+
+        const key = item.respon_text?.toUpperCase();
+        if (responData[key]) {
+          responData[key][idx] = parseInt(item.jml, 10) || 0;
+        }
+      });
 
       setChartData({
-        labels,
-        datasets: [
-          {
-            label: "Jumlah Deklarasi",
-            data,
-            backgroundColor: "#3B82F6",
-            borderRadius: 6,
-          },
-        ],
+        labels: bulanUrut,
+        datasets: responList.map((r) => ({
+          label: r,
+          data: responData[r],
+          backgroundColor: colors[r],
+          borderRadius: 4,
+        })),
       });
     } catch (error) {
       console.error("Fetch error:", error);
@@ -117,31 +124,26 @@ export default function MonthlySalesChart({
 
   useEffect(() => {
     fetchData();
-  }, [selectedUPT]);
+  }, [selectedUPT, isSuperadmin]);
+
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md w-full">
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md w-full min-h-[450px] flex flex-col">
       <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
         Statistik Deklarasi per Bulan
       </h2>
       {isLoading ? (
-        <div className="text-gray-500 dark:text-gray-300">Loading...</div>
+        <div className="flex-grow flex items-center justify-center text-gray-500 dark:text-gray-300">
+          Loading...
+        </div>
       ) : (
-        <div className="relative w-full h-[300px]">
+        <div className="relative w-full flex-grow">
           <Bar
             data={chartData}
             options={{
               responsive: true,
               maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: true,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
-              },
+              plugins: { legend: { display: true } },
+              scales: { y: { beginAtZero: true } },
             }}
           />
         </div>

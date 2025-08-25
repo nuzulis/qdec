@@ -39,10 +39,14 @@ export default function CustomRDTCRemoteTable({
   };
 
   const filteredData = useMemo(() => {
-    return rowData.filter((item) => {
-      const values = Object.values(item).join(" ").toLowerCase();
-      return values.includes(filterText.toLowerCase());
-    });
+    return rowData
+      .filter((item) => {
+        const values = Object.values(item).join(" ").toLowerCase();
+        return values.includes(filterText.toLowerCase());
+      })
+      .sort(
+        (a, b) => dayjs(b.tgl_tiba).valueOf() - dayjs(a.tgl_tiba).valueOf()
+      );
   }, [rowData, filterText]);
 
   const columns: TableColumn<RowType>[] = [
