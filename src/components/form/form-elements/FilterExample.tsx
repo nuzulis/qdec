@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import DatePicker from "../date-picker";
 import dayjs from "dayjs";
+import Select from "react-select";
 
 interface FilterExampleProps {
   onDataFiltered: (data: any[]) => void;
@@ -9,7 +10,7 @@ interface FilterExampleProps {
 
 export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
   const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const isSuperAdmin = user.upt === 1000; // tetap cek sebagai number
+  const isSuperAdmin = user.upt === 1000;
   const [upt, setUpt] = useState(isSuperAdmin ? "all" : String(user.upt));
 
   const [dFrom, setDFrom] = useState(dayjs().format("YYYY-MM-DD"));
@@ -18,36 +19,42 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
 
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
+
   const uptList = [
-    { id:"1100", nama: "BKHIT Aceh"},
-    { id:"1200", nama: "BBKHIT Sumatera Utara"},
-    { id:"1300", nama: "BKHIT Sumatera Barat"},
-    { id:"1400", nama: "BKHIT Riau"},
-    { id:"1600", nama: "BKHIT Sumatera Selatan"},
-    { id:"1800", nama: "BKHIT Lampung"},
-    { id:"1900", nama: "BKHIT Kepulauan Bangka Belitung"},
-    { id:"2100", nama: "BKHIT Kepulauan Riau"},
-    { id:"3100", nama: "BBKHIT DKI Jakarta"},
-    { id:"3200", nama: "BKHIT Jawa Barat"},
-    { id:"3300", nama: "BKHIT Jawa Tengah"},
-    { id:"3400", nama: "BKHIT Daerah Istimewa Yogyakarta"},
-    { id:"3500", nama: "BKHIT Jawa Timur"},
-    { id:"3600", nama: "BKHIT Banten"},
-    { id:"5100", nama: "BBKHIT Bali"},
-    { id:"5300", nama: "BKHIT Nusa Tenggara Timur"},
-    { id:"6100", nama: "BKHIT Kalimantan Barat"},
-    { id:"6300", nama: "BKHIT Kalimantan Selatan"},
-    { id:"6400", nama: "BBKHIT Kalimantan Timur"},
-    { id:"6500", nama: "BKHIT Kalimantan Utara"},
-    { id:"7100", nama: "BKHIT Sulawesi Utara"},
-    { id:"7200", nama: "BKHIT Sulawesi Tengah"},
-    { id:"7300", nama: "BBKHIT Sulawesi Selatan"},
-    { id:"8100", nama: "BKHIT Maluku"},
-    { id:"9100", nama: "BBKHIT Papua"},
-    { id:"9300", nama: "BKHIT Papua Selatan"},
-    { id:"9600", nama: "BKHIT Papua Barat Daya" },
-    
+    { id: "1100", nama: "BKHIT Aceh" },
+    { id: "1200", nama: "BBKHIT Sumatera Utara" },
+    { id: "1300", nama: "BKHIT Sumatera Barat" },
+    { id: "1400", nama: "BKHIT Riau" },
+    { id: "1600", nama: "BKHIT Sumatera Selatan" },
+    { id: "1800", nama: "BKHIT Lampung" },
+    { id: "1900", nama: "BKHIT Kepulauan Bangka Belitung" },
+    { id: "2100", nama: "BKHIT Kepulauan Riau" },
+    { id: "3100", nama: "BBKHIT DKI Jakarta" },
+    { id: "3200", nama: "BKHIT Jawa Barat" },
+    { id: "3300", nama: "BKHIT Jawa Tengah" },
+    { id: "3400", nama: "BKHIT Daerah Istimewa Yogyakarta" },
+    { id: "3500", nama: "BKHIT Jawa Timur" },
+    { id: "3600", nama: "BKHIT Banten" },
+    { id: "5100", nama: "BBKHIT Bali" },
+    { id: "5300", nama: "BKHIT Nusa Tenggara Timur" },
+    { id: "6100", nama: "BKHIT Kalimantan Barat" },
+    { id: "6300", nama: "BKHIT Kalimantan Selatan" },
+    { id: "6400", nama: "BBKHIT Kalimantan Timur" },
+    { id: "6500", nama: "BKHIT Kalimantan Utara" },
+    { id: "7100", nama: "BKHIT Sulawesi Utara" },
+    { id: "7200", nama: "BKHIT Sulawesi Tengah" },
+    { id: "7300", nama: "BBKHIT Sulawesi Selatan" },
+    { id: "8100", nama: "BKHIT Maluku" },
+    { id: "9100", nama: "BBKHIT Papua" },
+    { id: "9300", nama: "BKHIT Papua Selatan" },
+    { id: "9600", nama: "BKHIT Papua Barat Daya" },
   ];
+
+  const uptOptions = [
+    { value: "all", label: "Semua UPT" },
+    ...uptList.map((u) => ({ value: u.id, label: u.nama })),
+  ];
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -147,18 +154,13 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
             <label className="text-sm font-medium mb-1 dark:text-white/90">
               UPT
             </label>
-            <select
-              value={upt}
-              onChange={(e) => setUpt(e.target.value)}
-              className="h-11 w-full rounded-lg border ..."
-            >
-              <option value="all">Semua UPT</option>
-              {uptList.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nama}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={uptOptions}
+              value={uptOptions.find((o) => o.value === upt)}
+              onChange={(option) => setUpt(option?.value || "all")}
+              isClearable
+              placeholder="Pilih UPT..."
+            />
           </div>
         )}
 

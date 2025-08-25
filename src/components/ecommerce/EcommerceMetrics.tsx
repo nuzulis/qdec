@@ -15,6 +15,8 @@ const EcommerceMetrics = ({
   selectedUPT,
   isSuperadmin,
 }: EcommerceMetricsProps) => {
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const isSuperAdmin = user.upt === 1000;
   const [metrics, setMetrics] = useState<MetricData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +24,6 @@ const EcommerceMetrics = ({
   useEffect(() => {
     const fetchData = async () => {
       if (!isSuperadmin && !selectedUPT) {
-        setError("UPT tidak boleh kosong untuk user biasa.");
-        setLoading(false);
         return;
       }
 
@@ -86,11 +86,7 @@ const EcommerceMetrics = ({
               value: rilis + periksa + qbin,
               color: "bg-blue-500",
             },
-            {
-              label: "Rilis Bulan Ini",
-              value: rilis,
-              color: "bg-green-500",
-            },
+            { label: "Rilis Bulan Ini", value: rilis, color: "bg-green-500" },
             {
               label: "Periksa Lanjut Bulan Ini",
               value: periksa,
