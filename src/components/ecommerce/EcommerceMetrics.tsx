@@ -15,8 +15,8 @@ const EcommerceMetrics = ({
   selectedUPT,
   isSuperadmin,
 }: EcommerceMetricsProps) => {
-  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  const isSuperAdmin = user.upt === 1000;
+  // const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  // const isSuperAdmin = user.upt === 1000;
   const [metrics, setMetrics] = useState<MetricData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
