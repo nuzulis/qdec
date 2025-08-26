@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 interface EcommerceMetricsProps {
   selectedUPT: string;
-  isSuperadmin?: boolean;
 }
 
 interface MetricData {
@@ -11,12 +10,9 @@ interface MetricData {
   color: string;
 }
 
-const EcommerceMetrics = ({
-  selectedUPT,
-  isSuperadmin,
-}: EcommerceMetricsProps) => {
-  // const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-  // const isSuperAdmin = user.upt === 1000;
+const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const isSuperadmin = user.upt === 1000;
   const [metrics, setMetrics] = useState<MetricData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
