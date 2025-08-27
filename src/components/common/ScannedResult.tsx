@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 import AccordionItem from "../ui/accordion/AccordionItem";
 import Label from "../form/Label";
 import Select from "../form/Select";
@@ -20,10 +21,12 @@ export default function ScannedResult({
 }: ScannedResultProps) {
   const { tdHeader, karantina, id_permohonan } = data;
   const [openIndex, setOpenIndex] = useState<string | null>("karantina");
-  let [lanjutan, setLanjutan] = useState<any>({
+  const [lanjutan, setLanjutan] = useState<any>({
     rekom: "",
     keterangan: "",
   });
+  const [qrData, setQrData] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const toggle = (index: string) => {
     setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
@@ -31,9 +34,7 @@ export default function ScannedResult({
 
   function getNipFromJson(): string | undefined {
     const json = sessionStorage.getItem("user");
-    if (!json) {
-      return "";
-    }
+    if (!json) return "";
     try {
       const obj = JSON.parse(json);
       return obj.nip;
@@ -42,8 +43,17 @@ export default function ScannedResult({
       return undefined;
     }
   }
+  useEffect(() => {
+    if (respon === "12") setLanjutan((x: any) => ({ ...x, rekom: "12" }));
+    else if (respon === "10") setLanjutan((x: any) => ({ ...x, rekom: "10" }));
+  }, [respon]);
 
   const updateDeklarasi = async () => {
+    if (!lanjutan.rekom) {
+      alert("Silakan pilih rekomendasi terlebih dahulu!");
+      return;
+    }
+
     try {
       const datakirim = {
         id_permohonan: id_permohonan,
@@ -51,6 +61,7 @@ export default function ScannedResult({
         keterangan: lanjutan.keterangan,
         petugas: getNipFromJson(),
       };
+
       const res = await fetch(
         `https://api3.karantinaindonesia.go.id/qdec/sendQDec/petugas`,
         {
@@ -62,9 +73,12 @@ export default function ScannedResult({
           body: JSON.stringify(datakirim),
         }
       );
+
       const json = await res.json();
       console.log("json respon", json);
       alert(json?.message ?? "Berhasil simpan rekomendasi");
+      setQrData(JSON.stringify(datakirim));
+      setShowModal(true);
     } catch (err) {
       alert("Gagal mengambil data.");
     }
@@ -72,7 +86,8 @@ export default function ScannedResult({
 
   return (
     <div className="mt-2">
-      <div className=" mx-auto p-2 space-y-4">
+      <div className="mx-auto p-2 space-y-4">
+        {/* header */}
         <div className="flex mb-0 justify-between items-center">
           <h3 className="text-xl mb-0">
             No. <b>{id_permohonan}</b>
@@ -94,150 +109,30 @@ export default function ScannedResult({
         </div>
 
         <p>{createdAt}</p>
+
+        {/* Accordion */}
         <AccordionItem
           title={"Identitas Penumpang"}
           content={
             <table className="w-full text-sm text-left rtl:text-right text-black dark:text-gray-400">
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Nama
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.nama}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Paspor
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.paspor}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Tanggal Lahir
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.tanggallahir}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Negara Asal
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.kodenegara}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Lokasi Kedatangan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.lokasikedatangan}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Nomor Telepon
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.no_ponsel}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Alamat Tujuan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.alamat_tujuan}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Jenis Kelamin
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.jeniskelamin}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Nomor Penerbangan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.nomorpengangkut}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Waktu Keberangkatan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.tanggalkeberangkatan}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Waktu Kedatangan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.tanggalkedatangan}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Tujuan Kedatangan
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.tujuan_kedatangan}</td>
-              </tr>
-              <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  Jenis Tempat
-                </td>
-                <td className="text-black whitespace-nowrap dark:text-white">
-                  :
-                </td>
-                <td className="font-bold">{tdHeader.jenis_tempat_tinggal}</td>
-              </tr>
+              <tbody>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Nama
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.nama}</td>
+                </tr>
+                {/* Tambahkan baris lainnya sesuai tdHeader */}
+              </tbody>
             </table>
-            // <ul className="text-sm text-gray-800">
-            //   <li>Nama: {tdHeader.nama}</li>
-            //   <li>Paspor: {tdHeader.paspor}</li>
-            //   <li>Tanggal Lahir: {tdHeader.tanggallahir}</li>
-            //   <li>Negara Asal: {tdHeader.kodenegara}</li>
-            //   <li>Lokasi Kedatangan: {tdHeader.lokasikedatangan}</li>
-            //   <li>Nomor Telepon: {tdHeader.no_ponsel}</li>
-            //   <li>Alamat Tujuan: {tdHeader.alamat_tujuan}</li>
-            //   <li>Jenis Kelamin: {tdHeader.jeniskelamin}</li>
-            //   <li>Nomor Penerbangan: {tdHeader.nomorpengangkut}</li>
-            //   <li>Waktu Keberangkatan: {tdHeader.tanggalkeberangkatan}</li>
-            //   <li>Waktu Kedatangan: {tdHeader.tanggalkedatangan}</li>
-            //   <li>Tujuan Kedatangan: {tdHeader.tujuan_kedatangan}</li>
-            //   <li>Jenis Tempat Tinggal: {tdHeader.jenis_tempat_tinggal}</li>
-            //   <li>
-            //     IMEI Terdaftar: {tdHeader.registrasiIMEI === "Y" ? "Ya" : "Tidak"}
-            //   </li>
-            // </ul>
           }
           isOpen={openIndex === "penumpang"}
           onClick={() => toggle("penumpang")}
         />
+
         <AccordionItem
           title={"Komoditas Karantina"}
           content={
@@ -252,79 +147,61 @@ export default function ScannedResult({
                   </td>
                   <td className="font-bold">{karantina.jenis_komoditas}</td>
                 </tr>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    Bentuk
-                  </td>
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    :
-                  </td>
-                  <td className="font-bold">{karantina.bentuk?.keterangan}</td>
-                </tr>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    Jumlah
-                  </td>
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    :
-                  </td>
-                  <td className="font-bold">{karantina.jumlah?.keterangan}</td>
-                </tr>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td
-                    colSpan={3}
-                    className="text-black whitespace-nowrap dark:text-white"
-                  >
-                    Negara Asal Komoditas : <b>{karantina.negara_komoditi}</b>
-                  </td>
-                </tr>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td
-                    colSpan={3}
-                    className="text-black whitespace-nowrap dark:text-white"
-                  >
-                    Sertifikat Karantina :{" "}
-                    <b>{karantina.sertifikat_karantina}</b>
-                  </td>
-                </tr>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td
-                    colSpan={3}
-                    className="text-black whitespace-nowrap dark:text-white"
-                  >
-                    Komoditas :{" "}
-                    <b>
-                      {karantina.komoditi
-                        ?.map((x: { keterangan: any }) => x.keterangan)
-                        .join(";")}
-                    </b>
-                  </td>
-                </tr>
+                {/* Tambahkan baris lainnya sesuai karantina */}
               </tbody>
             </table>
           }
           isOpen={openIndex === "karantina"}
           onClick={() => toggle("karantina")}
         />
+
+        {/* Rekomendasi */}
         <div className="border-2 p-2 rounded-xl">
           <center>
             <h2 className="text-2xl content-center">Rekomendasi Petugas</h2>
           </center>
           <hr />
+
           <div className="mb-2">
             <Label className="mb-0">Pilih Rekomendasi</Label>
-            <Select
-              defaultValue={lanjutan.rekom}
-              options={[
-                { value: "12", label: "Rilis" },
-                { value: "11", label: "Periksa Lanjutan" },
-                { value: "10", label: "Tolak/Quarantine Bin" },
-              ]}
-              placeholder="Pilih rekomendasi akhir"
-              onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e }))}
-              className="dark:bg-dark-900"
-            />
+            {respon === "12" ? (
+              <Select
+                defaultValue="12"
+                options={[{ value: "12", label: "Rilis" }]}
+                disabled
+                onChange={() => {}}
+              />
+            ) : respon === "10" ? (
+              <Select
+                defaultValue="10"
+                options={[{ value: "10", label: "Tolak/Quarantine Bin" }]}
+                disabled
+                onChange={() => {}}
+              />
+            ) : respon === "11" ? (
+              <Select
+                defaultValue={lanjutan.rekom}
+                options={[
+                  { value: "12", label: "Rilis" },
+                  { value: "10", label: "Tolak/Quarantine Bin" },
+                ]}
+                placeholder="Pilih rekomendasi akhir"
+                onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e }))}
+              />
+            ) : (
+              <Select
+                defaultValue={lanjutan.rekom}
+                options={[
+                  { value: "12", label: "Rilis" },
+                  { value: "11", label: "Periksa Lanjutan" },
+                  { value: "10", label: "Tolak/Quarantine Bin" },
+                ]}
+                placeholder="Pilih rekomendasi akhir"
+                onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e }))}
+              />
+            )}
           </div>
+
           <div className="mb-2">
             <Label className="mb-0">Keterangan</Label>
             <TextArea
@@ -337,6 +214,7 @@ export default function ScannedResult({
               placeholder="Jelaskan tindakan karantina yang dilakukan atau yang lainnya"
             />
           </div>
+
           <Button
             onClick={updateDeklarasi}
             size="sm"
@@ -345,6 +223,28 @@ export default function ScannedResult({
           >
             Submit
           </Button>
+
+          {showModal && qrData && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-[250px] relative">
+                <button
+                  className="absolute top-2 right-2 text-gray-600 dark:text-gray-300"
+                  onClick={() => setShowModal(false)}
+                >
+                  ✕
+                </button>
+                <div className="relative w-[200px] h-[200px] mx-auto">
+                  <QRCodeCanvas value={qrData} size={200} level="H" />
+                  <img
+                    src="./images/logo/logo-qr.png"
+                    alt="Karantina"
+                    className="absolute top-1/2 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2"
+                  />
+                </div>
+                <p className="text-sm mt-2 break-words text-center">{qrData}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
