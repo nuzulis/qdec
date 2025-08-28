@@ -77,7 +77,11 @@ export default function ScannedResult({
       const json = await res.json();
       console.log("json respon", json);
       alert(json?.message ?? "Berhasil simpan rekomendasi");
-      setQrData(JSON.stringify(datakirim));
+      const encodedId = btoa(datakirim.id_permohonan);
+      // file PHP nya belom dibuat
+      const qrUrl = `https://passq.karantinaindonesia.go.id/{file_php yang buat nampilin}.php?id=${encodedId}`;
+
+      setQrData(qrUrl);
       setShowModal(true);
     } catch (err) {
       alert("Gagal mengambil data.");
@@ -241,7 +245,6 @@ export default function ScannedResult({
                     className="absolute top-1/2 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2"
                   />
                 </div>
-                <p className="text-sm mt-2 break-words text-center">{qrData}</p>
               </div>
             </div>
           )}
