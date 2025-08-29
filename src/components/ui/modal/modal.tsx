@@ -96,11 +96,11 @@ export default function DetailModal({
                 <span
                   className={
                     "text-sm px-3 py-1 rounded-full font-semibold shadow inline-block " +
-                    (data?.respon === "10"
+                    (data?.rekom_petugas === "10"
                       ? "bg-red-100 text-red-700"
-                      : data?.respon === "11"
+                      : data?.rekom_petugas === "11"
                       ? "bg-yellow-100 text-yellow-800"
-                      : data?.respon === "12"
+                      : data?.rekom_petugas === "12"
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-100 text-gray-700")
                   }
@@ -108,6 +108,7 @@ export default function DetailModal({
                   {data?.rekom_petugas_text || "-"}
                 </span>
               </p>
+
               <p>
                 <strong>Respon:</strong>{" "}
                 <span

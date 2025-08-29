@@ -11,6 +11,7 @@ interface ScannedResultProps {
   createdAt: string;
   respon: string;
   responText: string;
+  onClose?: () => void;
 }
 
 export default function ScannedResult({
@@ -18,8 +19,10 @@ export default function ScannedResult({
   createdAt,
   respon,
   responText,
+  onClose,
 }: ScannedResultProps) {
-  const { tdHeader, karantina, id_permohonan } = data;
+  const { tdHeader, karantina, id_permohonan, rekom_petugas_text } = data;
+
   const [openIndex, setOpenIndex] = useState<string | null>("karantina");
   const [lanjutan, setLanjutan] = useState<any>({
     rekom: "",
@@ -43,6 +46,7 @@ export default function ScannedResult({
       return undefined;
     }
   }
+
   useEffect(() => {
     if (respon === "12") setLanjutan((x: any) => ({ ...x, rekom: "12" }));
     else if (respon === "10") setLanjutan((x: any) => ({ ...x, rekom: "10" }));
@@ -75,12 +79,10 @@ export default function ScannedResult({
       );
 
       const json = await res.json();
-      console.log("json respon", json);
       alert(json?.message ?? "Berhasil simpan rekomendasi");
-      const encodedId = btoa(datakirim.id_permohonan);
-      // file PHP nya belom dibuat
-      const qrUrl = `https://passq.karantinaindonesia.go.id/{file_php yang buat nampilin}.php?id=${encodedId}`;
 
+      const encodedId = btoa(datakirim.id_permohonan);
+      const qrUrl = `https://passq.karantinaindonesia.go.id/detail.php?id=${encodedId}`;
       setQrData(qrUrl);
       setShowModal(true);
     } catch (err) {
@@ -91,7 +93,7 @@ export default function ScannedResult({
   return (
     <div className="mt-2">
       <div className="mx-auto p-2 space-y-4">
-        {/* header */}
+        {/* Header */}
         <div className="flex mb-0 justify-between items-center">
           <h3 className="text-xl mb-0">
             No. <b>{id_permohonan}</b>
@@ -129,7 +131,6 @@ export default function ScannedResult({
                   </td>
                   <td className="font-bold">{tdHeader.nama}</td>
                 </tr>
-                {/* Tambahkan baris lainnya sesuai tdHeader */}
               </tbody>
             </table>
           }
@@ -151,7 +152,6 @@ export default function ScannedResult({
                   </td>
                   <td className="font-bold">{karantina.jenis_komoditas}</td>
                 </tr>
-                {/* Tambahkan baris lainnya sesuai karantina */}
               </tbody>
             </table>
           }
@@ -160,95 +160,115 @@ export default function ScannedResult({
         />
 
         {/* Rekomendasi */}
-        <div className="border-2 p-2 rounded-xl">
+        <div className="border-2 p-4 rounded-xl">
           <center>
-            <h2 className="text-2xl content-center">Rekomendasi Petugas</h2>
+            <h2 className="text-2xl font-semibold mb-2">Rekomendasi Petugas</h2>
           </center>
-          <hr />
+          <hr className="mb-4" />
 
-          <div className="mb-2">
-            <Label className="mb-0">Pilih Rekomendasi</Label>
-            {respon === "12" ? (
-              <Select
-                defaultValue="12"
-                options={[{ value: "12", label: "Rilis" }]}
-                disabled
-                onChange={() => {}}
-              />
-            ) : respon === "10" ? (
-              <Select
-                defaultValue="10"
-                options={[{ value: "10", label: "Tolak/Quarantine Bin" }]}
-                disabled
-                onChange={() => {}}
-              />
-            ) : respon === "11" ? (
-              <Select
-                defaultValue={lanjutan.rekom}
-                options={[
-                  { value: "12", label: "Rilis" },
-                  { value: "10", label: "Tolak/Quarantine Bin" },
-                ]}
-                placeholder="Pilih rekomendasi akhir"
-                onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e }))}
-              />
-            ) : (
-              <Select
-                defaultValue={lanjutan.rekom}
-                options={[
-                  { value: "12", label: "Rilis" },
-                  { value: "11", label: "Periksa Lanjutan" },
-                  { value: "10", label: "Tolak/Quarantine Bin" },
-                ]}
-                placeholder="Pilih rekomendasi akhir"
-                onChange={(e) => setLanjutan((x: any) => ({ ...x, rekom: e }))}
-              />
-            )}
-          </div>
-
-          <div className="mb-2">
-            <Label className="mb-0">Keterangan</Label>
-            <TextArea
-              value={lanjutan.keterangan}
-              onChange={(e) =>
-                setLanjutan((x: any) => ({ ...x, keterangan: e }))
-              }
-              rows={2}
-              className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
-              placeholder="Jelaskan tindakan karantina yang dilakukan atau yang lainnya"
-            />
-          </div>
-
-          <Button
-            onClick={updateDeklarasi}
-            size="sm"
-            className="w-full"
-            variant="primary"
-          >
-            Submit
-          </Button>
-
-          {showModal && qrData && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-[250px] relative">
-                <button
-                  className="absolute top-2 right-2 text-gray-600 dark:text-gray-300"
-                  onClick={() => setShowModal(false)}
-                >
-                  ✕
-                </button>
-                <div className="relative w-[200px] h-[200px] mx-auto">
-                  <QRCodeCanvas value={qrData} size={200} level="H" />
-                  <img
-                    src="./images/logo/logo-qr.png"
-                    alt="Karantina"
-                    className="absolute top-1/2 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2"
-                  />
-                </div>
-              </div>
+          {rekom_petugas_text ? (
+            <div className="flex justify-center mt-4">
+              <span
+                className={`inline-block px-6 py-3 text-xl font-bold rounded-full ${
+                  rekom_petugas_text === "PERIKSA"
+                    ? "bg-yellow-400 text-yellow-900"
+                    : rekom_petugas_text === "RILIS"
+                    ? "bg-green-400 text-green-900"
+                    : rekom_petugas_text === "TOLAK/Q-BIN"
+                    ? "bg-red-400 text-red-900"
+                    : "bg-gray-300 text-gray-900"
+                }`}
+              >
+                {rekom_petugas_text}
+              </span>
             </div>
+          ) : (
+            <>
+              <div className="mb-4">
+                <Label className="mb-0">Pilih Rekomendasi</Label>
+                {respon === "12" ? (
+                  <Select
+                    defaultValue="12"
+                    options={[{ value: "12", label: "Rilis" }]}
+                    disabled
+                    onChange={() => {}}
+                  />
+                ) : respon === "10" ? (
+                  <Select
+                    defaultValue="10"
+                    options={[{ value: "10", label: "Tolak/Quarantine Bin" }]}
+                    disabled
+                    onChange={() => {}}
+                  />
+                ) : (
+                  <Select
+                    defaultValue={lanjutan.rekom}
+                    options={[
+                      { value: "12", label: "Rilis" },
+                      { value: "10", label: "Tolak/Quarantine Bin" },
+                    ]}
+                    placeholder="Pilih rekomendasi akhir"
+                    onChange={(e) =>
+                      setLanjutan((x: any) => ({ ...x, rekom: e }))
+                    }
+                  />
+                )}
+              </div>
+
+              <div className="mb-4">
+                <Label className="mb-0">Keterangan</Label>
+                <TextArea
+                  value={lanjutan.keterangan}
+                  onChange={(e) =>
+                    setLanjutan((x: any) => ({ ...x, keterangan: e }))
+                  }
+                  rows={2}
+                  placeholder="Jelaskan tindakan karantina yang dilakukan atau yang lainnya"
+                  className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                />
+              </div>
+
+              <Button
+                onClick={updateDeklarasi}
+                size="sm"
+                className="w-full"
+                variant="primary"
+              >
+                Submit
+              </Button>
+            </>
           )}
         </div>
+
+        {/* Modal QR */}
+        {showModal && qrData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-[280px] relative">
+              <button
+                className="absolute top-2 right-2 text-gray-600 dark:text-gray-300"
+                onClick={() => {
+                  setShowModal(false);
+                  if (onClose) onClose();
+                }}
+              >
+                ✕
+              </button>
+              <div className="relative w-[200px] h-[200px] mx-auto">
+                <QRCodeCanvas
+                  id="qrCodeCanvas"
+                  value={qrData}
+                  size={200}
+                  level="H"
+                />
+                <img
+                  src="./images/logo/logo-qr.png"
+                  alt="Karantina"
+                  className="absolute top-1/2 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

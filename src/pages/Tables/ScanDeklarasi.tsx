@@ -36,7 +36,13 @@ export default function ScanDeklarasi() {
       <div className="space-y-6">
         <CariDeklarasi onSubmit={handleDataFetched} />
         {data && (
-          <ScannedResult data={data} createdAt={createdAt} respon={respon} responText={responText} />
+          <ScannedResult
+            data={data}
+            createdAt={createdAt}
+            respon={respon}
+            responText={responText}
+            onClose={() => setData(null)}
+          />
         )}
       </div>
     </>
