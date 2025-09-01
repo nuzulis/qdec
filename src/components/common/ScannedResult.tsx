@@ -240,10 +240,10 @@ export default function ScannedResult({
           )}
         </div>
 
-        {/* Modal QR */}
         {showModal && qrData && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-[280px] relative">
+              {/* Tombol Close */}
               <button
                 className="absolute top-2 right-2 text-gray-600 dark:text-gray-300"
                 onClick={() => {
@@ -266,6 +266,39 @@ export default function ScannedResult({
                   className="absolute top-1/2 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2"
                 />
               </div>
+              <button
+                className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => {
+                  const qrCanvas = document.getElementById(
+                    "qrCodeCanvas"
+                  ) as HTMLCanvasElement;
+                  const logoImg = new Image();
+                  logoImg.src = "./images/logo/logo-qr.png";
+
+                  logoImg.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const size = qrCanvas.width;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext("2d");
+
+                    if (ctx) {
+                      ctx.drawImage(qrCanvas, 0, 0);
+                      const logoSize = size * 0.2;
+                      const x = (size - logoSize) / 2;
+                      const y = (size - logoSize) / 2;
+                      ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+                      const url = canvas.toDataURL("image/png");
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.download = "qr-code.png";
+                      link.click();
+                    }
+                  };
+                }}
+              >
+                Download QR
+              </button>
             </div>
           </div>
         )}
