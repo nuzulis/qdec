@@ -75,6 +75,14 @@ export default function DetailModal({
               <p>
                 <strong>Bentuk:</strong> {data?.bentuk_mp_id}
               </p>
+              {parsedPayload?.karantina?.komoditi && (
+                <p>
+                  <strong>Komoditas:</strong>{" "}
+                  {parsedPayload.karantina.komoditi
+                    .map((k: any) => k.keterangan)
+                    .join(", ")}
+                </p>
+              )}
               {parsedPayload?.karantina?.jumlah?.keterangan && (
                 <p>
                   <strong>Jumlah:</strong>{" "}
@@ -129,7 +137,10 @@ export default function DetailModal({
 
               <p>
                 <strong>Jenis MP:</strong> {data?.jns_karantina} -{" "}
-                {data?.bentuk_mp_id}
+                {data?.bentuk_mp_id} -{" "}
+                {parsedPayload?.karantina?.komoditi
+                  .map((k: any) => k.keterangan)
+                  .join(", ")}
               </p>
             </div>
           }

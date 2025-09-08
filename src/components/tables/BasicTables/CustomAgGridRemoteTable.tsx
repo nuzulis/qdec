@@ -18,6 +18,7 @@ type RowType = {
   bentuk_mp_id?: string;
   respon_text?: string;
   rekom_petugas_text?: string;
+  payload?: string;
 };
 
 export default function CustomRDTCRemoteTable({
@@ -99,16 +100,46 @@ export default function CustomRDTCRemoteTable({
     },
     {
       name: "MP",
-      selector: (row) =>
-        `${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}`,
-      cell: (row) => (
-        <span className="text-sm">
-          {`${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}`}
-        </span>
-      ),
+      selector: (row) => {
+        let komoditi = "";
+        try {
+          const payload = row.payload ? JSON.parse(row.payload) : null;
+          komoditi = payload?.karantina?.komoditi
+            ?.map((k: any) => k.keterangan)
+            .join(", ");
+        } catch (e) {
+          console.error("Invalid payload JSON:", e);
+        }
+        return `${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}${
+          komoditi ? " - " + komoditi : ""
+        }`;
+      },
+      cell: (row) => {
+        let komoditi = "";
+        try {
+          const payload = row.payload ? JSON.parse(row.payload) : null;
+          komoditi = payload?.karantina?.komoditi
+            ?.map((k: any) => k.keterangan)
+            .join(", ");
+        } catch (e) {
+          console.error("Invalid payload JSON:", e);
+        }
+
+        return (
+          <span className="text-sm">
+            {row.jns_karantina || ""} - {row.bentuk_mp_id || ""}
+            {komoditi && (
+              <>
+                {" - "}
+                <strong>{komoditi}</strong>
+              </>
+            )}
+          </span>
+        );
+      },
       sortable: true,
       wrap: true,
-      maxWidth: "200px",
+      maxWidth: "350px",
     },
     {
       name: "Respon",
@@ -137,14 +168,14 @@ export default function CustomRDTCRemoteTable({
       },
       sortable: true,
       wrap: true,
-      maxWidth: "200px",
+      maxWidth: "150px",
     },
     {
       name: "Rekom Petugas",
       selector: (row) => row.rekom_petugas_text || "-",
       sortable: true,
       wrap: true,
-      maxWidth: "200px",
+      maxWidth: "150px",
     },
     {
       name: "Detail",

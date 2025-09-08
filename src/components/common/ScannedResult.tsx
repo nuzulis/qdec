@@ -7,7 +7,7 @@ import Button from "../ui/button/Button";
 import TextArea from "../form/input/TextArea";
 
 interface ScannedResultProps {
-  data: any;
+  data: any; // payload sudah di-parse
   createdAt: string;
   respon: string;
   responText: string;
@@ -82,7 +82,7 @@ export default function ScannedResult({
       alert(json?.message ?? "Berhasil simpan rekomendasi");
 
       const encodedId = btoa(datakirim.id_permohonan);
-      const qrUrl = `https://passq.karantinaindonesia.go.id/detail.php?id=${encodedId}`;
+      const qrUrl = `const qrUrl = http://localhost/officer/detail.php?id=${encodedId}`;
       setQrData(qrUrl);
       setShowModal(true);
     } catch (err) {
@@ -131,6 +131,60 @@ export default function ScannedResult({
                   </td>
                   <td className="font-bold">{tdHeader.nama}</td>
                 </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    No. Paspor
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.paspor}</td>
+                </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Negara Asal Lokasi Kedatangan
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.kodenegara}</td>
+                </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Lokasi Kedatangan
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.lokasikedatangan}</td>
+                </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Nomor Penerbangan
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.nomorpengangkut}</td>
+                </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Waktu Keberangkatan
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.tanggalkeberangkatan}</td>
+                </tr>
+                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    Waktu Kedatangan
+                  </td>
+                  <td className="text-black whitespace-nowrap dark:text-white">
+                    :
+                  </td>
+                  <td className="font-bold">{tdHeader.tanggalkedatangan}</td>
+                </tr>
               </tbody>
             </table>
           }
@@ -138,19 +192,45 @@ export default function ScannedResult({
           onClick={() => toggle("penumpang")}
         />
 
+        {/* Accordion Komoditas Karantina */}
         <AccordionItem
           title={"Komoditas Karantina"}
           content={
-            <table className="w-full text-left rtl:text-right text-black dark:text-gray-400">
+            <table className="w-full text-left text-black">
               <tbody>
-                <tr className="border-b dark:bg-black dark:border-gray-700 border-gray-200">
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    Jenis
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Jenis Komoditas</td>
+                  <td>:</td>
+                  <td>{karantina.jenis_komoditas}</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Komoditas</td>
+                  <td>:</td>
+                  <td>
+                    {karantina.komoditi
+                      .map((k: any) => k.keterangan)
+                      .join(", ")}
                   </td>
-                  <td className="text-black whitespace-nowrap dark:text-white">
-                    :
-                  </td>
-                  <td className="font-bold">{karantina.jenis_komoditas}</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Bentuk</td>
+                  <td>:</td>
+                  <td>{karantina.bentuk.keterangan}</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Jumlah</td>
+                  <td>:</td>
+                  <td>{karantina.jumlah.keterangan}</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Negara Komoditi</td>
+                  <td>:</td>
+                  <td>{karantina.negara_komoditi}</td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="font-medium">Disertai Sertifikat Karantina</td>
+                  <td>:</td>
+                  <td>{karantina.sertifikat_karantina}</td>
                 </tr>
               </tbody>
             </table>
@@ -158,7 +238,6 @@ export default function ScannedResult({
           isOpen={openIndex === "karantina"}
           onClick={() => toggle("karantina")}
         />
-
         {/* Rekomendasi */}
         <div className="border-2 p-4 rounded-xl">
           <center>
