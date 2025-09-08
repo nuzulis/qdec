@@ -108,7 +108,7 @@ export default function CustomRDTCRemoteTable({
             ?.map((k: any) => k.keterangan)
             .join(", ");
         } catch (e) {
-          console.error("Invalid payload JSON:", e);
+          // console.error("Invalid payload JSON:", e);
         }
         return `${row.jns_karantina || ""} - ${row.bentuk_mp_id || ""}${
           komoditi ? " - " + komoditi : ""
@@ -122,7 +122,7 @@ export default function CustomRDTCRemoteTable({
             ?.map((k: any) => k.keterangan)
             .join(", ");
         } catch (e) {
-          console.error("Invalid payload JSON:", e);
+          // console.error("Invalid payload JSON:", e);
         }
 
         return (

@@ -42,7 +42,7 @@ export default function ScannedResult({
       const obj = JSON.parse(json);
       return obj.nip;
     } catch (e) {
-      console.error("Invalid JSON:", e);
+      // console.error("Invalid JSON:", e);
       return undefined;
     }
   }

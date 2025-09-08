@@ -96,13 +96,13 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
         if (result.status) {
           allData.push(...result.data);
         } else {
-          console.warn("API Error:", result.message);
+          // console.warn("API Error:", result.message);
         }
       }
 
       onDataFiltered(allData);
     } catch (error) {
-      console.error("Fetch error:", error);
+      // console.error("Fetch error:", error);
       onDataFiltered([]);
     } finally {
       setIsLoading(false);

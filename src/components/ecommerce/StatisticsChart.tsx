@@ -51,7 +51,7 @@ export default function StatisticsChart({ selectedUPT, isSuperadmin }: Props) {
           setRows([]);
         }
       } catch (err) {
-        console.error("Error fetching:", err);
+        // console.error("Error fetching:", err);
         setRows([]);
       } finally {
         setLoading(false);
