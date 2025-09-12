@@ -49,9 +49,9 @@ export default function StatisticsChart({ selectedUPT, isSuperadmin }: Props) {
 
       if (json?.status && Array.isArray(json?.data) && json.data.length > 0) {
         setRows(json.data);
-        setSource(todayOnly ? "today" : "last7days"); // ✅ set source
+        setSource(todayOnly ? "today" : "last7days");
       } else if (todayOnly) {
-        await fetchData(false); // fallback ke 7 hari terakhir
+        await fetchData(false);
       } else {
         setRows([]);
         setSource("last7days");

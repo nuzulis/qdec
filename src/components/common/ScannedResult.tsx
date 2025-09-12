@@ -7,7 +7,7 @@ import Button from "../ui/button/Button";
 import TextArea from "../form/input/TextArea";
 
 interface ScannedResultProps {
-  data: any; // payload sudah di-parse
+  data: any;
   createdAt: string;
   respon: string;
   responText: string;
