@@ -128,7 +128,7 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
             id="tanggal-dari"
             value={dFrom}
             onChange={setDFrom}
-            className="w-full"
+            className="w-full h-11 rounded-lg border px-3 text-sm"
           />
         </div>
 
@@ -144,7 +144,7 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
             id="tanggal-sampai"
             value={dTo}
             onChange={setDTo}
-            className="w-full"
+            className="w-full h-11 rounded-lg border px-3 text-sm"
           />
         </div>
 
@@ -160,15 +160,23 @@ export default function FilterExample({ onDataFiltered }: FilterExampleProps) {
               onChange={(option) => setUpt(option?.value || "all")}
               isClearable
               placeholder="Pilih UPT..."
+              className="h-11"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  minHeight: "44px", // biar sama tinggi dgn h-11
+                }),
+              }}
             />
           </div>
         )}
 
         {/* Tombol Filter */}
-        <div className="flex items-end">
+        <div className="flex flex-col">
+          <label className="invisible mb-1">Filter</label>
           <button
             onClick={fetchData}
-            className="h-11 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg text-sm shadow-theme-xs"
+            className="h-11 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 rounded-lg text-sm shadow-theme-xs"
           >
             {isLoading ? "Memuat..." : "Filter"}
           </button>

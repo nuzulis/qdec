@@ -82,7 +82,7 @@ export default function ScannedResult({
       alert(json?.message ?? "Berhasil simpan rekomendasi");
 
       const encodedId = btoa(datakirim.id_permohonan);
-      const qrUrl = `const qrUrl = http://localhost/officer/detail.php?id=${encodedId}`;
+      const qrUrl = `const qrUrl = https://passq.karantinaindonesia.go.id/detail.php?id=${encodedId}`;
       setQrData(qrUrl);
       setShowModal(true);
     } catch (err) {

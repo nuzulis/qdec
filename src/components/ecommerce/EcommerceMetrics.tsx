@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
-
+import { ComponentType, SVGProps, useEffect, useState } from "react";
+import {
+  CheckCircleIcon,
+  MagnifyingGlassCircleIcon,
+  XCircleIcon,
+  ClockIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/solid";
 interface EcommerceMetricsProps {
   selectedUPT: string;
 }
@@ -8,6 +14,7 @@ interface MetricData {
   label: string;
   value: number;
   color: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>; // tambahkan ini
 }
 
 const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
@@ -35,7 +42,7 @@ const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
 
       try {
         const response = await fetch(
-          "https://api3.karantinaindonesia.go.id/qdec/findQDec/dashboard",
+          "https://api3.karantinaindonesia.go.id/qdec/findQDec/dashPetugas",
           {
             method: "POST",
             headers: {
@@ -66,32 +73,42 @@ const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
             return;
           }
 
-          let rilis = 0;
-          let periksa = 0;
-          let qbin = 0;
-
-          for (const d of data) {
-            if (d.respon_text === "RILIS") rilis += Number(d.jml);
-            else if (d.respon_text === "PERIKSA") periksa += Number(d.jml);
-            else if (d.respon_text === "TOLAK/Q-BIN") qbin += Number(d.jml);
-          }
+          const d = data[0];
+          const rilis = Number(d.rilis) || 0;
+          const periksa = Number(d.periksa) || 0;
+          const tolak_qbin = Number(d.tolak_qbin) || 0;
+          const belum = Number(d.belum) || 0;
 
           setMetrics([
             {
               label: "Total Bulan Ini",
-              value: rilis + periksa + qbin,
+              value: rilis + periksa + tolak_qbin + belum,
               color: "bg-blue-500",
+              icon: ChartBarIcon,
             },
-            { label: "Rilis Bulan Ini", value: rilis, color: "bg-green-500" },
+            {
+              label: "Rilis Bulan Ini",
+              value: rilis,
+              color: "bg-green-500",
+              icon: CheckCircleIcon,
+            },
             {
               label: "Periksa Lanjut Bulan Ini",
               value: periksa,
               color: "bg-yellow-500",
+              icon: MagnifyingGlassCircleIcon,
             },
             {
               label: "Quarantine Bin Bulan Ini",
-              value: qbin,
+              value: tolak_qbin,
               color: "bg-red-500",
+              icon: XCircleIcon,
+            },
+            {
+              label: "Belum Respon Bulan Ini",
+              value: belum,
+              color: "bg-purple-500",
+              icon: ClockIcon,
             },
           ]);
         } else {
@@ -111,23 +128,34 @@ const EcommerceMetrics = ({ selectedUPT }: EcommerceMetricsProps) => {
   }, [selectedUPT, isSuperadmin]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
       {loading ? (
-        <div className="col-span-4 flex justify-center items-center py-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500"></div>
+        <div className="col-span-5 flex justify-center items-center py-6">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-4 border-blue-600"></div>
         </div>
       ) : error ? (
-        <p className="col-span-4 text-center text-red-500">{error}</p>
+        <p className="col-span-5 text-center text-red-500 font-medium">
+          {error}
+        </p>
       ) : (
-        metrics.map((metric, index) => (
-          <div
-            key={index}
-            className={`rounded-lg p-4 shadow-md text-white ${metric.color}`}
-          >
-            <div className="text-sm font-medium">{metric.label}</div>
-            <div className="text-2xl font-bold">{metric.value}</div>
-          </div>
-        ))
+        metrics.map((metric, index) => {
+          const Icon = metric.icon;
+          return (
+            <div
+              key={index}
+              className={`rounded-xl p-5 shadow-lg text-white flex items-center space-x-4 ${metric.color}`}
+            >
+              <Icon className="h-10 w-10 opacity-80" />
+              <div>
+                <div className="text-sm font-medium">{metric.label}</div>
+                <div className="text-2xl font-bold">
+                  {" "}
+                  {metric.value.toLocaleString("id-ID")}
+                </div>
+              </div>
+            </div>
+          );
+        })
       )}
     </div>
   );
