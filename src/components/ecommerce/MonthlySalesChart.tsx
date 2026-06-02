@@ -33,7 +33,7 @@ export default function MonthlySalesChart({
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const tahun = "2025";
+  const tahun = String(new Date().getFullYear());
   const username = "imigrasiok";
   const password = "6SyfPqjD68RRQKe";
 
@@ -60,7 +60,7 @@ export default function MonthlySalesChart({
             Authorization: `Basic ${btoa(`${username}:${password}`)}`,
           },
           body: JSON.stringify(params),
-        }
+        },
       );
 
       const json = await res.json();
@@ -129,7 +129,7 @@ export default function MonthlySalesChart({
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md w-full min-h-[450px] flex flex-col">
       <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-        Statistik Deklarasi per Bulan
+        Statistik Deklarasi per Bulan, Tahun {new Date().getFullYear()}
       </h2>
       {isLoading ? (
         <div className="flex-grow flex items-center justify-center text-gray-500 dark:text-gray-300">

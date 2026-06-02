@@ -225,18 +225,30 @@ export default function CustomRDTCRemoteTable({
     const worksheet = workbook.addWorksheet("Data Deklarasi");
     worksheet.columns = [
       { header: "Nomor QR", key: "id_qr", width: 20 },
-      { header: "Nama Penumpang", key: "nama_penumpang", width: 125 },
+      { header: "Nama Penumpang", key: "nama_penumpang", width: 30 },
+      { header: "No Paspor", key: "id_pass", width: 20 },
       { header: "Negara Asal", key: "neg_asal", width: 20 },
       { header: "Port Tujuan", key: "port_tuju", width: 20 },
       { header: "Nomor Voyage", key: "nama_no_angkut", width: 25 },
       { header: "Tanggal Tiba", key: "tgl_tiba", width: 15 },
-      { header: "MP", key: "mp", width: 30 },
+      { header: "MP", key: "mp", width: 40 },
       { header: "Respon", key: "respon_text", width: 15 },
       { header: "Rekom Petugas", key: "rekom_petugas_text", width: 20 },
     ];
     worksheet.getRow(1).font = { bold: true };
 
     filteredData.forEach((item) => {
+      let komoditi = "";
+      try {
+        const payload = item.payload ? JSON.parse(item.payload) : null;
+        komoditi = payload?.karantina?.komoditi
+          ?.map((k: any) => k.keterangan)
+          .join(", ");
+      } catch (e) {
+        // ignore parse error
+      }
+      const mp = `${item.jns_karantina || ""} - ${item.bentuk_mp_id || ""}${komoditi ? " - " + komoditi : ""}`;
+
       worksheet.addRow({
         id_qr: item.id_qr,
         nama_penumpang: item.nama_penumpang,
@@ -244,8 +256,8 @@ export default function CustomRDTCRemoteTable({
         neg_asal: item.neg_asal,
         port_tuju: item.port_tuju,
         nama_no_angkut: item.nama_no_angkut,
-        tgl_tiba: item.tgl_tiba,
-        mp: `${item.jns_karantina || ""} - ${item.bentuk_mp_id || ""}`,
+        tgl_tiba: dayjs(item.tgl_tiba).format("DD/MM/YYYY"),
+        mp,
         respon_text: item.respon_text?.toUpperCase() || "-",
         rekom_petugas_text: item.rekom_petugas_text || "-",
       });

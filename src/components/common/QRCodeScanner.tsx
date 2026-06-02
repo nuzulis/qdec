@@ -36,7 +36,14 @@ export default function QRCodeScanner({ onClose, onScan }: QRCodeScannerProps) {
       try {
         await scanner.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
+          {
+            fps: 10,
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+              const size = Math.floor(minEdge * 0.7);
+              return { width: size, height: size };
+            },
+          },
           async (decodedText) => {
             try {
               await scanner.stop();
@@ -147,7 +154,8 @@ export default function QRCodeScanner({ onClose, onScan }: QRCodeScannerProps) {
       <div
         ref={qrRef}
         id="qr-reader"
-        className="w-full h-64 rounded-md overflow-hidden"
+        className="w-full rounded-md overflow-hidden"
+        style={{ minHeight: "280px" }}
       />
 
       {errorMsg && (
